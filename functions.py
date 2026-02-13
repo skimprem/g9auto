@@ -224,13 +224,53 @@ def expand_dataframe_with_fg5_files(df, point_path_col='full_path'):
     return pd.DataFrame(expanded_rows).reset_index(drop=True)
 
 def add_comments(row, comments_text):
-    """Добавляет комментарии для каждой строки"""
+    """Add comments to the row based on the order and direction."""
     if row['order'] == 'zero' and pd.notna(row.get('direction')) and row['direction'] is not None:
-        # Разбиваем direction на parts: "north_01" -> ["north", "01"]
+        # get direction and approach: "north_01" -> ["north", "01"]
         parts = str(row['direction']).split('_')
         if len(parts) == 2:
-            direction_part = parts[0]  # north или south
-            approach_part = parts[1]   # 01, 02, 03
-            return f"{comments_text}\nDirection: {direction_part}\nApproach: {approach_part}"
+            direction_part = parts[0]  # north or south
+            approach_part = parts[1]   # 01, 02, 03, etc.
+            return f"{comments_text}\n\nDirection: {direction_part}\n\nApproach: {approach_part}"
     return comments_text
 
+def find_and_fill_edit(dialog, label_text, value):
+    '''Finds a Static element with label_text and fills the nearest Edit element to the right'''
+    try:
+        # find the Static element with the specified label text
+        static_elem = dialog.child_window(title_re=f'.*{label_text}.*', class_name='Static')
+        static_rect = static_elem.rectangle()
+        
+        # find Edit elements and locate the nearest one to the right of the Static element
+        candidates = []
+        
+        # get all children of the dialog
+        all_children = list(dialog.children())
+        
+        for child in all_children:
+            try:
+                if child.class_name() == 'Edit':
+                    child_rect = child.rectangle()
+                    
+                    # check if the Edit is to the right and on the same row as the Static element
+                    same_row = abs(child_rect.top - static_rect.top) < 12
+                    is_to_the_right = child_rect.left > static_rect.right
+                    
+                    if same_row and is_to_the_right:
+                        distance = child_rect.left - static_rect.right
+                        candidates.append((distance, child))
+            except:
+                pass
+        
+        if candidates:
+            # Choose the candidate with the smallest distance
+            candidates.sort(key=lambda x: x[0])
+            closest_edit = candidates[0][1]
+            
+            closest_edit.set_text(str(value))
+            return True
+        else:
+            return False
+            
+    except Exception as e:
+        return False
