@@ -8,9 +8,6 @@
     "zero_absolute_file": "zero_absolute.txt",
     "output_dir": "output"
   },
-  "filter": {
-    "station": "akto"
-  },
   "comments_tab": {
     "company_institution": "RSE NCGSI"
   },
@@ -32,7 +29,7 @@
   },
   "uncertainties": {
     "Earth Tides Factor:": "0.001",
-    "Ocean Load Factor:": "0.1",
+    "Ocean Load Factor:": "0.01",
     "Barometric (µGal):": "1",
     "Polar Motion (µGal):": "0.05",
     "Tide Swell (µGal):": "0",
@@ -42,7 +39,6 @@
     "Clock (µGal):": "0.66",
     "System Model (µGal):": "4.8",
     "System (µGal):": "3.21",
-    "Grad. Uncert. (µGal/cm):": "0.057",
-    "Gradient (µGal):": "4.03"
+    "Grad. Uncert. (µGal/cm):": "0.03"
   }
 }
