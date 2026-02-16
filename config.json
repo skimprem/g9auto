@@ -1,4 +1,9 @@
 {
+  "logging": {
+    "verbose": true,
+    "log_to_file": true,
+    "log_dir": "logs"
+  },
   "paths": {
     "g9_exe": "C:\\Program Files (x86)\\Micro-g LaCoste Inc\\bin\\g9.exe",
     "info_path": "C:\\gData\\gPointFiles",
