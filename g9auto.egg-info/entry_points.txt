@@ -1,2 +1,0 @@
-[console_scripts]
-g9auto = g9auto.cli:main

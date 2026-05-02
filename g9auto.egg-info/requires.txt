@@ -1,4 +1,0 @@
-pywinauto
-pandas
-PyYAML
-astropy
