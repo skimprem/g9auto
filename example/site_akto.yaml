@@ -1,0 +1,36 @@
+# Example: single-site processing for Aktobe station.
+# Run from repository root:
+#   g9auto run --site example/site_akto.yaml --config config.yaml
+
+fg5_file: ./example/1303_akto.fg5
+date: 2023-07-28
+
+site:
+  # Real values for station akto
+  name: akto
+  code: "1303"
+  latitude: 50.2886
+  longitude: 57.1663
+  elevation: 199.0
+  setup_height: 1.0 # cm
+  # transfer_height: 67.2 # cm
+  # h_eff: 0.672 # m
+  # h_eff_plate: 0.682 # m
+
+  # Option A: direct gradient value (operator-provided), µGal/cm.
+  # gradient: -2.738
+  # gradient_ste: 0.057
+
+  # Option B: compute from quadratic profile.
+  # Remove "gradient" and "gradient_ste" above to activate this block.
+  gradient_params:
+    a: -274.74
+    b: 1.30
+    ua: 3.88
+    ub: 2.70
+    covab: -10.25
+
+  # Explicit laser/Rb values from reference/1303_akto.project.txt
+  red: 632.99027404
+  blue: 632.99125578
+  frequency: 9999999.99775

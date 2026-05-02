@@ -1,2 +1,15 @@
 /.vscode
 /__pycache__
+/.venv
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite
+*.log
+/build
+/dist
+/eggs
+/*.egg-info
+/.idea
+/.vscode

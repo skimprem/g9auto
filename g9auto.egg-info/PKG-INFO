@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: g9auto
+Version: 0.1.0
+Summary: Automation tool for Micro-g LaCoste g9 software
+Requires-Python: >=3.10
+Requires-Dist: pywinauto
+Requires-Dist: pandas
+Requires-Dist: PyYAML
+Requires-Dist: astropy

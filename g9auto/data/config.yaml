@@ -1,0 +1,97 @@
+logging:
+  verbose: true
+  log_to_file: true
+  log_dir: logs
+
+paths:
+  g9_exe: C:\Program Files (x86)\Micro-g LaCoste Inc\bin\g9.exe
+
+gravimeter:
+  # Active instrument type used for default effective height, when h_eff is not provided.
+  type: A10
+  effective_height_cm:
+    A10: 68.3
+    FG5: 122.0
+
+comments_tab:
+  operator: Roman Sermiagin
+  institution: RSE NCGSI
+  comments: "Reprocessing comments:"
+
+corrections:
+  checkboxes:
+    Barometric Pressure: true
+    Polar Motion: true
+    Reference Xo: false
+    Transfer Height: true
+    Self Attraction: true
+    Diffraction: true
+    Tilt: false
+  values:
+    Baro. Fact: "0.3"
+    Self Attraction Correction: "-0.58"
+    Diffraction Correction: "1.2"
+
+uncertainties:
+  "Earth Tides Factor:": "0.001"
+  "Ocean Load Factor:": "0.01"
+  "Barometric (µGal):": "1"
+  "Polar Motion (µGal):": "0.05"
+  "Tide Swell (µGal):": "0"
+  "Water Table (µGal):": "0"
+  "Unmodeled (µGal):": "0.58"
+  "Laser (µGal):": "0.7"
+  "Clock (µGal):": "0.66"
+  "System Model (µGal):": "4.8"
+  "System (µGal):": "3.21"
+  "Grad. Uncert. (µGal/cm):": "0.03"
+
+# Calibration data for laser wavelengths and Rb frequency standard.
+# Used for linear interpolation to any date within the covered range.
+calibration:
+
+  # Laser wavelengths (HeNe iodine-stabilized, L Series).
+  # Units: fm (femtometres, 1e-15 m). Values represent the measured
+  # wavelength of the red (632 nm) and blue (doubled) beams.
+  # ste — standard error of the mean of the calibration measurement.
+  laser:
+    - date: 2022-08-01
+      red: 632.9902642
+      red_ste: 0.633
+      blue: 632.9912568
+      blue_ste: 0.633
+      type: ref
+    - date: 2024-09-01
+      red: 632.990285076
+      red_ste: 0.036
+      blue: 632.991249743
+      blue_ste: 0.036
+      type: ref
+    - date: 2025-10-23
+      red: 632.990269144
+      red_ste: 0.038
+      blue: 632.991258559
+      blue_ste: 0.038
+      type: ref
+
+  # Rubidium frequency standard calibration.
+  # Units: MHz (megahertz). Nominal value is 10 MHz.
+  # The G-9 app expects the frequency in Hz — multiply by 1e6 before use.
+  # ste — standard error of the mean of the calibration measurement.
+  rubidium:
+    - date: 2022-08-01
+      frequency: 10.00000000001
+      frequency_ste: 1.0e-8
+      type: ref
+    - date: 2023-09-01
+      frequency: 9.99999999753
+      frequency_ste: 1.22e-11
+      type: ref
+    - date: 2024-09-01
+      frequency: 9.99999999739
+      frequency_ste: 5.8e-12
+      type: ref
+
+processing:
+  # Date of the measurement to process. Used for interpolation of calibration data.
+  timeout_seconds: 60

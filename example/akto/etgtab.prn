@@ -1,0 +1,160 @@
+ Routine ETPOTA, version 930710 FORTRAN 77.
+
+ Tidal component development from tidal potential development.
+
+ TAMURA 1987   tidal potential development is used.
+
+ Routine ETGCOF, version 930706 FTN 77.
+
+ Computation of geodetic coefficients
+
+ Parameters of Geodetic Reference System 1980:
+ Major semi axis                      6378137.  m
+ 1. excentricity                    0.00669438
+ Geocentric gravitational constant    398600.5 10**9 m**3/s**2
+
+ Station paremeters:
+
+ Latitude                          50.288600 deg
+ Geocentric latitude               50.099336 deg
+ Longitude                         57.166300 deg
+ Height                              199.000 m
+ Gravity                            9.810347 m/s**2
+ Geocentric radius               6365724.377 m
+ Component of observations                 0
+ Azimuth from north direction       0.000000 deg
+
+
+ Astronomic constants International Astronomic Union 1984 m.kg.s-system
+ Moons mean sine parallax   3422.448000
+ Mass relation Earth/Moon     81.300681
+
+ DOODSONs constant             2.627689 m**2/s**2
+ F                             0.021025 mas/(nm/s**2)
+
+
+
+ Routine ETLOVE, version 930706 FTN77.
+ Latitude dependent parameters for an elliptical, rotating,
+ inelastic and oceanless Earth from WAHR-DEHANT-ZSCHAU model.
+
+    frequency of wave O1: 13.943036 deg per hour
+    resonance frequency : 15.073729 deg per hour
+
+    resonance factor for G: -0.000625
+    resonance factor for h: -0.002505
+    resonance factor for k: -0.001261
+    resonance factor for l:  0.000078
+    resonance factor for T:  0.001244
+
+
+
+ Latitude dependent elastic parameters
+
+ ellipsoidal latitude:   50.2886 deg
+
+ G    is gravimetric factor delta
+ h    is LOVE-number  h
+ k    is LOVE-number  k
+ l    is SHIDA-number l
+ T    is tilt factor gamma
+
+ degree  order         G         h         k         l         T
+ 
+      2      0  1.165684  0.617826  0.304668  0.086219  0.686842
+      2      1  1.152966  0.607380  0.301860  0.082729  0.694480
+      2      2  1.157298  0.614651  0.305832  0.082498  0.691181
+ 
+      3      0  1.072800  0.294600  0.094200  0.014900  0.799600
+      3      1  1.072800  0.294600  0.094200  0.014900  0.799600
+      3      2  1.072800  0.294600  0.094200  0.014900  0.799600
+      3      3  1.069237  0.295669  0.096694  0.014900  0.801025
+ 
+      4      0  1.036300  0.180700  0.042700  0.010000  0.862000
+      4      1  1.036300  0.180700  0.042700  0.010000  0.862000
+      4      2  1.036300  0.180700  0.042700  0.010000  0.862000
+      4      3  1.036300  0.180700  0.042700  0.010000  0.862000
+      4      4  1.034910  0.181362  0.045613  0.010000  0.864251
+
+
+ Geodetic coefficients and phases for component   0
+ azimuth:    0.000000 degree
+
+ GC 2,0     317.51153  nm/s**2       360.000000 deg
+ GC 2,1     810.69797  nm/s**2       180.000000 deg
+ GC 2,2     337.79410  nm/s**2       180.000000 deg
+ GC 3,0      55.07281  nm/s**2       180.000000 deg
+ GC 3,1    1119.47793  nm/s**2       360.000000 deg
+ GC 3,2    1011.33387  nm/s**2       180.000000 deg
+ GC 3,3     324.75218  nm/s**2       180.000000 deg
+ GC 4,0     519.19515  nm/s**2       360.000000 deg
+ GC 4,1     862.78734  nm/s**2       360.000000 deg
+ GC 4,2    1642.80634  nm/s**2       360.000000 deg
+ GC 4,3    1023.72860  nm/s**2       180.000000 deg
+ GC 4,4     277.52338  nm/s**2       180.000000 deg
+
+
+
+
+
+ ***** Routine ETGCOF finished the execution.
+
+ Routine ETASTE, version 930531 FTN 77.
+
+ Astronomic elements for initial epoch 2023  7 28 8. UTC
+ Julian date                   :    2460153.8298
+ Correction to UTC to give TDT :          62.184 s
+
+ TAMURAs 1987 formulas are used.
+
+ F1       49.93771726063 deg  F1.       14.49205212129 deg/hour
+ F2      251.68243451843 deg  F2.        0.54901650998 deg/hour
+ F3      125.73579454308 deg  F3.        0.04106863997 deg/hour
+ F4      322.40672393775 deg  F4.        0.00464180794 deg/hour
+ F5      330.82529664514 deg  F5.        0.00220640567 deg/hour
+ F6      283.34266219306 deg  F6.        0.00000196184 deg/hour
+ F7       97.72449681660 deg  F7.        0.03760491672 deg/hour
+ F8      349.02725750163 deg  F8.        0.02568838695 deg/hour
+
+
+
+
+ ***** Routine ETASTE finished the execution.
+
+
+
+ Sum of potential coefficients :
+  4.922400  4.921790  4.921440  4.914900  4.936867
+
+
+ Number of waves is         :  1200
+ Number of amplitudes > 0 is:  1200
+
+
+
+
+ ***** Routine ETPOTA finished execution.
+
+ Program ETGTAB, version 3.20 950124FORTRAN 77
+
+
+
+
+
+ Wave groups and observed tidal parameters
+
+  no. from   to ampl.fac. phase lead        ampl.  WD body 
+                              [deg]
+
+    1    1    2    1.0000    0.0000     DC    234.4368    1.1657
+    2    3  281    1.1600    0.0000     Long   49.6157    1.1657
+    3  282  424    1.1542    0.0000     Q1     58.4738    1.1532
+    4  425  530    1.1542    0.0000     O1    305.4070    1.1530
+    5  531  547    1.1491    0.0000     P1    142.1052    1.1474
+    6  548  731    1.1349    0.0000     K1    429.5266    1.1320
+    7  732  880    1.1617    0.0000     N2     58.7372    1.1573
+    8  881  975    1.1617    0.0000     M2    306.7860    1.1573
+    9  976  995    1.1617    0.0000     S2    142.7330    1.1573
+   10  996 1108    1.1617    0.0000     K2     38.7894    1.1573
+   11 1109 1190    1.0734    0.0000     M3      3.8585    1.0692
+   12 1191 1200    1.0390    0.0000     M4      0.0450    1.0349

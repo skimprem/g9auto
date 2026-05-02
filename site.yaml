@@ -1,0 +1,81 @@
+# Single-site project configuration for g9auto.
+# Copy this template to your working directory with:
+#   g9auto site-init
+# Then fill in the values and run:
+#   g9auto run --site my_site.yaml --config config.yaml
+
+# Path to the .fg5 project file (required).
+fg5_file: C:\Users\roman\gitrepo\g9auto\example\akto\1303_akto.fg5
+
+# Measurement date in ISO format (YYYY-MM-DD).
+# Used to interpolate laser wavelengths and Rb frequency from config.yaml
+# calibration data and to compute polar motion parameters (polar_x, polar_y)
+# from IERS. Required if red/blue/frequency are not specified directly.
+date: 2023-07-28
+
+site:
+  name: Aktobe           # station display name → G-9 "Name" field
+  code: "1303"                 # point code           → G-9 "Code" field
+  latitude:   50.2886        # decimal degrees, WGS-84
+  longitude:  57.1663        # decimal degrees, WGS-84
+  elevation:  199.0          # m above sea level
+
+  # Setup height (cm) links h_eff and h_eff_plate.
+  # It is measured from the plate plane to the mark tip:
+  #   negative -> mark protrudes above the plate plane
+  #   positive -> mark is recessed below the plate plane
+  # Relation: h_eff_plate = h_eff + setup_height / 100
+  setup_height: 1.0
+
+  # Transfer Height for g9 field (cm).
+  # Optional. If omitted, the final pass uses setup_height as the target
+  # height and computes the actual gradient between h_eff_plate and
+  # setup_height.
+  # transfer_height: 67.2
+
+  # Effective measurement height (= plate height + setup offset), metres.
+  # Optional. If omitted, g9auto runs two-pass mode (vgg=0 and vgg=-3.086),
+  # derives h_eff_plate, then performs a final run with computed gradient
+  # between h_eff_plate and transfer_height, or setup_height if
+  # transfer_height is not provided.
+  # h_eff: 0.672
+
+  # Effective height from the plate plane, metres.
+  # Optional but recommended when available because final VGG is computed
+  # from h_eff_plate and transfer_height, or from h_eff_plate and
+  # setup_height when transfer_height is omitted.
+  h_eff_plate: 0.682
+
+  # Polar motion components (arcseconds). Optional.
+  # If omitted, values are computed from date via IERS.
+  # polar_x: 0.0
+  # polar_y: 0.0
+
+  # ── Gradient (choose ONE option) ──────────────────────────────────────
+
+  # Option A │ Gradient provided directly (µGal/cm).
+  #           │ Use when the value is known from a previous computation
+  #           │ or set by the operator.
+  # gradient:     -3.086        # µGal/cm
+  # gradient_ste:  0.03         # µGal/cm (1-sigma)
+
+  # Option B │ Compute gradient from a quadratic gravity profile fit.
+  #           │ Comment out Option A and uncomment the block below.
+  #           │
+  #           │ Model: g(h) = g0 + a·h + (b/2)·h²
+  #           │ Mean VGG from h1 to h2 = a + (b/2)·(h1 + h2)
+  #           │
+  gradient_params:
+    a:      -274.74   # linear coefficient,    µGal/m
+    b:         1.30   # quadratic coefficient, µGal/m²
+    ua:        3.88   # std.err of a,           µGal/m
+    ub:        2.70   # std.err of b,           µGal/m²
+    covab:   -10.25   # covariance(a, b),       µGal²/m³
+
+  # ── Laser / clock overrides (optional) ────────────────────────────────
+  # If omitted, values are interpolated from config.yaml calibration data
+  # using the date specified above.
+  #
+  red:       632.99027404    # red laser wavelength,  fm
+  blue:      632.99125578    # blue laser wavelength, fm
+  frequency: 9999999.99775    # Rb clock frequency,    Hz

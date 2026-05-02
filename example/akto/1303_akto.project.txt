@@ -1,0 +1,127 @@
+Micro-g LaCoste g Processing Report
+File Created: 05/03/26, 02:48:12
+
+Project Name: 1303_akto
+g Acquisition Version: 9.210113
+g Processing Version: 9.210114
+
+Company/Institution: RSE NCGSI
+Operator: Danil
+
+Station Data
+Name: Aktobe
+Site Code: 1303
+Lat:  50.28860 Long:   57.16630 Elev:  199.00 m
+Setup Height: -1.00 cm
+Transfer Height: 67.20 cm
+Actual Height: 70.70 cm
+Gradient: -2.739 µGal/cm
+Nominal Air Pressure:  989.57 mBar
+Barometric Admittance Factor:  0.30
+Polar Motion Coord: 0.2523 " 0.4808 "
+Earth Tide (ETGTAB) Selected
+Potential Filename: C:\gData\gWavefiles\ETCPOT.dat
+Delta Factor Filename: C:\gData\OceanLoad-MGL.dff
+Delta Factors
+     Start   Stop     Amplitude    Phase Term
+  0.000000  0.000001   1.000000   0.0000 DC   
+  0.000002  0.249951   1.160000   0.0000 Long 
+  0.721500  0.906315   1.154250   0.0000 Q1   
+  0.921941  0.974188   1.154240   0.0000 O1   
+  0.989049  0.998028   1.149150   0.0000 P1   
+  0.999853  1.216397   1.134890   0.0000 K1   
+  1.719381  1.906462   1.161720   0.0000 N2   
+  1.923766  1.976926   1.161720   0.0000 M2   
+  1.991787  2.002885   1.161720   0.0000 S2   
+  2.003032  2.182843   1.161720   0.0000 K2   
+  2.753244  3.081254   1.07338    0.0000 M3   
+  3.791964  3.937897   1.03900    0.0000 M4   
+Ocean Load ON, Filename: C:\gData\OceanLoad-MGL.olf
+Waves:               M2    S2     K1     O1     N2     P1     K2     Q1     Mf     Mm     Ssa
+Amplitude (µGal):  0.510  0.263  1.254  0.755  0.044  0.382  0.065  0.150  0.020  0.008  0.104
+Phase (deg):       108.8   13.4   56.4   70.1  167.8   57.4  352.9   80.0   44.7 -124.6  -89.9
+
+Instrument Data
+Meter Type: A10
+Meter S/N: 063
+Factory Height: 71.70 cm
+Rubidium Frequency:   9999999.99775 Hz
+Offset:   0.000 µGal
+Laser: L-Series (000063)
+Blue Lock: 632.99125578 nm
+Red Lock: 632.99027404 nm
+
+Processing Results
+Date: 07/28/23
+Time: 07:29:22
+DOY: 209
+Year: 2023
+Time Offset (D h:m:s): 0 0:0:0
+Gravity:   980964737.41 µGal
+Set Scatter:  2.83 µGal 
+Measurement Precision:  0.82 µGal
+Total Uncertainty:  6.02 µGal
+Red/Blue Separation:     35.42 µGal
+Number of Sets Collected:   12
+Number of Sets Processed:   12
+Set #s Processed: 1,2,3,4,5,6,7,8,9,10,11,12
+Number of Sets NOT Processed:    0
+Set #s NOT Processed: 
+Number of Drops/Set:  120
+Total Drops Accepted:    1205
+Total Drops Rejected:     235
+Total Fringes Acquired:     300
+Fringe Start:    3
+Processed Fringes:    282
+TDC Fringe Divider:    256
+
+Acquisition Settings
+Sequence Interval: 10 min
+Red/Blue Interval: 5 min
+Drop Interval: 2 sec
+Number of Sets: 12
+Number of Drops: 120
+
+Gravity Corrections
+Earth Tide (ETGTAB): 54.30 µGal
+Ocean Load: -0.47 µGal
+Polar Motion:  5.03 µGal
+Barometric Pressure: -0.48 µGal
+Transfer Height:  9.59 µGal
+Diffraction:  1.20 µGal
+Self Attraction: -0.58 µGal
+
+Uncertainties
+Sigma Reject:  2.40
+Earth Tide Factor: 0.001 
+Average Earth Tide Uncertainty:  0.05 µGal
+Ocean Load Factor:  0.01 
+Average Ocean Load Uncertainty:  0.00 µGal
+Barometric:  1.00 µGal
+Polar Motion:  0.05 µGal
+Laser:  0.70 µGal
+Clock:  0.66 µGal
+System Type:  4.80 µGal
+Tidal Swell:  0.00 µGal
+Water Table:  0.00 µGal
+Unmodeled:  0.58 µGal
+System Setup:  3.21 µGal
+Gradient: 0.074 µGal (0.021 µGal/cm)
+
+
+Comments
+
+
+=== Reprocessing comments === 
+
+Date: 2026-02-15
+
+Institute: RSE National Centre of Geodesy and Spatial Information
+
+Reprocessing features:
+- Laser wavelengths refined
+- Rubidium frequency refined
+- Error budget revised
+- Self-attraction and diffraction corrections introduced
+
+Note: Result refers to the effective height

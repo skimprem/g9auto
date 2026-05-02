@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g9auto"
+version = "0.1.0"
+description = "Automation tool for Micro-g LaCoste g9 software"
+requires-python = ">=3.10"
+dependencies = [
+    "pywinauto",
+    "pandas",
+    "PyYAML",
+    "astropy",
+]
+
+[project.scripts]
+g9auto = "g9auto.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["g9auto*"]
+
+[tool.setuptools.package-data]
+"g9auto.data" = ["config.yaml", "site_template.yaml"]
