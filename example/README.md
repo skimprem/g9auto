@@ -12,12 +12,6 @@ Command:
 g9auto run --site example/site_akto.yaml --config config.yaml
 ```
 
-Reference validation (must match `reference/1303_akto.project.txt`):
-
-```powershell
-python example/verify_reference.py --generated example/1303_akto.project.txt --reference reference/1303_akto.project.txt
-```
-
 Use this mode when you process one project directly.
 
 ## 2) Batch mode (`--data`)
@@ -36,12 +30,6 @@ Optional filter (single row from list):
 g9auto run --data example/sites_akto_batch.csv --station 63 --config config.yaml
 ```
 
-Then validate the generated report against reference:
-
-```powershell
-python example/verify_reference.py --generated example/1303_akto.project.txt --reference reference/1303_akto.project.txt
-```
-
 Use this mode to process a list of points. The CSV intentionally contains
 only fields required by `g9auto.site.prepare_site` and `run_app`:
 
@@ -57,8 +45,7 @@ only fields required by `g9auto.site.prepare_site` and `run_app`:
 
 Notes:
 
-- `polar_x` and `polar_y` are computed automatically from `date` (IERS),
-	like in `qazgrf24_proc/run_proc.py`.
+- `polar_x` and `polar_y` are computed automatically from `date` (IERS).
 - `transfer_height` must be provided in input (YAML/CSV).
 - If `h_eff` is omitted, `run_app` performs two runs (`vgg = 0` and
 	`vgg = -3.086`), computes effective height by:

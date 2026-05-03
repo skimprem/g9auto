@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-class G9Logger:
+class g9Logger:
     """Custom logger with verbose mode and section formatting."""
 
     _instance = None
@@ -21,7 +21,7 @@ class G9Logger:
         return cls._instance
 
     def __init__(self):
-        if G9Logger._initialized:
+        if g9Logger._initialized:
             return
 
         self.logger = logging.getLogger('g9auto')
@@ -30,7 +30,7 @@ class G9Logger:
         self._file_handler = None
         self._console_handler = None
 
-        G9Logger._initialized = True
+        g9Logger._initialized = True
 
     def setup(self, log_dir: str = 'logs', verbose: bool = False, log_to_file: bool = True):
         """
@@ -118,15 +118,15 @@ class G9Logger:
 _logger = None
 
 
-def get_logger() -> G9Logger:
+def get_logger() -> g9Logger:
     """Get the global logger instance."""
     global _logger
     if _logger is None:
-        _logger = G9Logger()
+        _logger = g9Logger()
     return _logger
 
 
-def setup_logging(log_dir: str = 'logs', verbose: bool = False, log_to_file: bool = True) -> G9Logger:
+def setup_logging(log_dir: str = 'logs', verbose: bool = False, log_to_file: bool = True) -> g9Logger:
     """
     Setup and configure the global logger.
 

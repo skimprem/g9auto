@@ -8,10 +8,10 @@ Mean gradient from h1 to h2 (both measured from the floor, h0 = 0):
     VGG = (g(h2) - g(h1)) / (h2 - h1) = a + (b/2)*(h1 + h2)
 
 Units convention used in this module:
-    a     [µGal/m],  b    [µGal/m²],  h [m]  →  VGG [µGal/m]
-    ua    [µGal/m],  ub   [µGal/m²],  covab [µGal²/m³]
+    a     [uGal/m],  b    [uGal/m²],  h [m]  →  VGG [uGal/m]
+    ua    [uGal/m],  ub   [uGal/m²],  covab [uGal²/m³]
 
-The G-9 application expects the gradient in µGal/cm → divide result by 100.
+The g9 application expects the gradient in uGal/cm → divide result by 100.
 """
 
 import math
@@ -24,9 +24,9 @@ def vgg_from_quadratic(a: float, b: float, h1: float, h2: float) -> float:
     Parameters
     ----------
     a : float
-        Linear coefficient of the quadratic gravity profile, µGal/m.
+        Linear coefficient of the quadratic gravity profile, uGal/m.
     b : float
-        Quadratic coefficient of the gravity profile, µGal/m².
+        Quadratic coefficient of the gravity profile, uGal/m².
     h1 : float
         Lower height, m (typically 0 = floor level).
     h2 : float
@@ -35,8 +35,8 @@ def vgg_from_quadratic(a: float, b: float, h1: float, h2: float) -> float:
     Returns
     -------
     float
-        Mean VGG between h1 and h2, µGal/m.
-        Divide by 100 to convert to µGal/cm for G-9 input.
+        Mean VGG between h1 and h2, uGal/m.
+        Divide by 100 to convert to uGal/cm for g9 input.
     """
     return a + 0.5 * b * (h1 + h2)
 
@@ -62,11 +62,11 @@ def vgg_ste_from_quadratic(
     Parameters
     ----------
     ua : float
-        Standard error of a, µGal/m.
+        Standard error of a, uGal/m.
     ub : float
-        Standard error of b, µGal/m².
+        Standard error of b, uGal/m².
     covab : float
-        Covariance of a and b, µGal²/m³.
+        Covariance of a and b, uGal²/m³.
     h1 : float
         Lower height, m.
     h2 : float
@@ -75,8 +75,8 @@ def vgg_ste_from_quadratic(
     Returns
     -------
     float
-        Standard error of VGG, µGal/m.
-        Divide by 100 to convert to µGal/cm.
+        Standard error of VGG, uGal/m.
+        Divide by 100 to convert to uGal/cm.
     """
     h_mean = 0.5 * (h1 + h2)
     variance = ua ** 2 + h_mean ** 2 * ub ** 2 + 2.0 * h_mean * covab

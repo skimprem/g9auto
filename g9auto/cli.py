@@ -160,7 +160,7 @@ def cmd_site_init(args):
 def main():
     parser = argparse.ArgumentParser(
         prog="g9auto",
-        description="Automation tool for Micro-g LaCoste G-9 gravimeter software.",
+        description="Automation tool for Micro-g LaCoste g9 gravimeter software.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -170,7 +170,7 @@ def main():
         help="Run the automation workflow.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=(
-            "Run G-9 automation for one or more projects.\n\n"
+            "Run g9 automation for one or more projects.\n\n"
             "Single site:   g9auto run --site site.yaml [--config config.yaml]\n"
             "List of sites: g9auto run --data sites.csv [--station CODE] [--config config.yaml]"
         ),

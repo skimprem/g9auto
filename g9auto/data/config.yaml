@@ -76,7 +76,7 @@ calibration:
 
   # Rubidium frequency standard calibration.
   # Units: MHz (megahertz). Nominal value is 10 MHz.
-  # The G-9 app expects the frequency in Hz — multiply by 1e6 before use.
+  # The g9 app expects the frequency in Hz — multiply by 1e6 before use.
   # ste — standard error of the mean of the calibration measurement.
   rubidium:
     - date: 2022-08-01

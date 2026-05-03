@@ -32,7 +32,7 @@ def interpolate(config: dict, date: Union[datetime.date, str]) -> dict:
         blue_ste      – interpolated std. error, fm
         frequency     – Rb frequency standard, MHz
         frequency_ste – interpolated std. error, MHz
-        frequency_hz  – Rb frequency converted to Hz (for G-9 app)
+        frequency_hz  – Rb frequency converted to Hz (for g9 app)
 
     Raises
     ------
@@ -68,7 +68,7 @@ def interpolate(config: dict, date: Union[datetime.date, str]) -> dict:
         y = np.array([r[field] for r in rb_records], dtype=float)
         result[field] = float(np.interp(target, rb_x, y))
 
-    # Convenience value in Hz for direct use with G-9 app
+    # Convenience value in Hz for direct use with g9 app
     result["frequency_hz"] = result["frequency"] * 1e6
 
     return result

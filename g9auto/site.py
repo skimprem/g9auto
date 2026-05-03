@@ -2,7 +2,7 @@
 Site parameter preparation for g9auto.
 
 Accepts two input formats:
-  1. A flat pandas DataFrame row (e.g. from a qazgrf24-style CSV).
+  1. A flat pandas DataFrame row.
   2. A nested dict loaded from a site YAML file.
 
 Both are normalised to the same flat dict and then processed into a dict
@@ -43,7 +43,7 @@ def prepare_dataframe(df: pd.DataFrame, config: dict, source_base_dir: Union[str
     Parameters
     ----------
     df : pd.DataFrame
-        Raw DataFrame loaded from a site CSV (e.g. qazgrf24.csv).
+        Raw DataFrame loaded from a site CSV.
     config : dict
         Loaded config.yaml.
 
@@ -85,7 +85,7 @@ def prepare_site(
         flat = _flatten_yaml_site(row)
     else:
         flat = dict(row) if hasattr(row, "to_dict") else dict(row)
-        # CSV: prefer station_name over station as the G-9 "Name" field
+        # CSV: prefer station_name over station as the g9 "Name" field
         if "station_name" in flat and _notna(flat.get("station_name")):
             flat["station"] = flat["station_name"]
 
@@ -133,7 +133,7 @@ def prepare_site(
             else:
                 h1 = float(flat.get("grad_h1", 0.0))
             vgg_m = vgg_from_quadratic(a, b, h1, h2)
-            flat["vgg"] = round(vgg_m / 100.0, 6)  # µGal/m → µGal/cm
+            flat["vgg"] = round(vgg_m / 100.0, 6)  # uGal/m → uGal/cm
 
     if not _notna(flat.get("vgg_ste")):
         h2 = _resolve_gradient_h2_m(flat)
@@ -148,7 +148,7 @@ def prepare_site(
             else:
                 h1 = float(flat.get("grad_h1", 0.0))
             ste_m = vgg_ste_from_quadratic(ua, ub, covab, h1, h2)
-            flat["vgg_ste"] = round(ste_m / 100.0, 6)  # µGal/m → µGal/cm
+            flat["vgg_ste"] = round(ste_m / 100.0, 6)  # uGal/m → uGal/cm
 
     # --- calibration: laser + Rb ----------------------------------------
     date = flat.get("date")
