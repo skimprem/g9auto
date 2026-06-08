@@ -83,7 +83,7 @@ def cmd_run(args):
 
     # auto-detect separator
     sep = _detect_sep(data_path)
-    df = pd.read_csv(data_path, sep=sep)
+    df = pd.read_csv(data_path, sep=sep, comment="#")
 
     # optional single-station filter
     if args.station:

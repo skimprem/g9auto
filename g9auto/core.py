@@ -2,17 +2,19 @@ import time
 import os
 import re
 from datetime import datetime
+import pandas as pd
 import pywinauto.keyboard as keyboard
 from pywinauto.application import Application
 from g9auto.logger import get_logger
 from g9auto.loader import read_project
-from g9auto.gradient import vgg_from_quadratic
+from g9auto.gradient import vgg_from_quadratic, vgg_ste_from_quadratic
+from g9auto.params import resolve_g9_params
 
 log = get_logger()
 
 
 def wait_main_enabled(main, timeout=30.0, poll=0.2):
-    """Wait until main G-9 window is enabled for menu actions."""
+    """Wait until main g9 window is enabled for menu actions."""
     start = time.time()
     while time.time() - start < timeout:
         try:
@@ -183,6 +185,18 @@ def info_tab(setup_dialog, row):
     find_and_fill_edit(setup_dialog, 'Transfer Height', row.transfer_height)
     find_and_fill_edit(setup_dialog, 'Polar X', row.polar_x)
     find_and_fill_edit(setup_dialog, 'Polar Y', row.polar_y)
+
+    log.info("Filled fields:\n" + "\n".join([
+        f"\tName='{row.station}'",
+        f"\tCode='{row.point}'",
+        f"\tLatitude={row.latitude}",
+        f"\tLongitude={row.longitude}",
+        f"\tElevation={row.elevation}",
+        f"\tGradient={row.vgg}",
+        f"\tTransfer Height={row.transfer_height}",
+        f"\tPolar X={row.polar_x}",
+        f"\tPolar Y={row.polar_y}",
+    ]))
 
     log.ok("All fields filled")
 
@@ -440,9 +454,10 @@ def comments_tab(setup_dialog, row, config):
 
     # Fill fields on the Comments tab
     log.section("Filling Comments")
-    find_and_fill_edit(setup_dialog, 'Company/Institution:', config['comments_tab']['company_institution'])
+    # find_and_fill_edit(setup_dialog, 'Instrument Operator:', config['comments_tab']['operator'])
+    find_and_fill_edit(setup_dialog, 'Company/Institution:', config['comments_tab']['institution'])
     today = datetime.now().strftime("%Y-%m-%d")
-    comments_with_date = f"=== Reprocessing comments === \n\nDate: {today}\n\n{row.comments}"
+    comments_with_date = f"=== Reprocessing comments === \n\nDate: {today}\n\n{config['comments_tab']['comments']}"
     comments_edit = setup_dialog.child_window(control_id=1054, class_name='Edit')
     fill_multiline_field(comments_edit, comments_with_date, clear=True)
     log.ok("Comments filled")
@@ -469,7 +484,7 @@ def setup_dialog(app, main, row, config):
     config['uncertainties']['Grad. Uncert. (µGal/cm):'] = row.vgg_ste
     control_tab(app, dlg, config)
 
-    # comments_tab(dlg, row, config)
+    comments_tab(dlg, row, config)
 
     # Close Setup dialog by clicking OK button
     time.sleep(0.5)
@@ -546,15 +561,6 @@ def close_app(main):
     log.success("All projects processed!")
 
 
-def _as_float(value):
-    try:
-        result = float(value)
-        if result != result:  # NaN check
-            return None
-        return result
-    except (TypeError, ValueError):
-        return None
-
 def _as_int(value):
     try:
         result = int(value)
@@ -568,20 +574,10 @@ def _report_txt_path(project_path, report_name=None):
         return os.path.join(os.path.dirname(project_path), f"{report_name}.project.txt")
     return os.path.splitext(project_path)[0] + '.project.txt'
 
-
-def _read_gravity_from_project_report(project_txt_path):
-    """Parse gravity value from a G-9 *.project.txt report."""
-    if not os.path.exists(project_txt_path):
-        return None
-
-    result, _ = read_project(project_txt_path)
-
-    return result[('Processing Results', 'Gravity', 'µGal')]
-
-
-def _run_single_pass(app, main, row, config, max_wait_time, vgg_value, transfer_height_cm, report_file=None):
+def _run_single_pass(app, main, row, config, max_wait_time, vgg_value, vgg_ste_value, transfer_height_cm, report_file=None):
     row_local = row.copy()
     row_local['vgg'] = vgg_value
+    row_local['vgg_ste'] = vgg_ste_value
     row_local['transfer_height'] = transfer_height_cm
 
     setup_dialog(app, main, row_local, config)
@@ -600,6 +596,9 @@ def _run_single_pass(app, main, row, config, max_wait_time, vgg_value, transfer_
 
 
 def run_app(df, config):
+
+    result = []
+
     app = Application(backend='win32').start(config['paths']['g9_exe'])
 
     time.sleep(1)
@@ -621,97 +620,111 @@ def run_app(df, config):
         # Use timeout from config or default to 1 minute
         max_wait_time = _as_int(getattr(config.get('processing', {}), 'timeout_seconds', None)) or 60
 
-        transfer_height = _as_float(getattr(row, 'transfer_height', None))
-        setup_height = _as_float(getattr(row, 'setup_height', None))
-        h_eff_plate = _as_float(getattr(row, 'h_eff_plate', None))
-        vgg = _as_float(getattr(row, 'vgg', None))
+        # transfer_height = _as_float(getattr(row, 'transfer_height', None))
+        # setup_height = _as_float(getattr(row, 'setup_height', None))
+        # h_eff_plate = _as_float(getattr(row, 'h_eff_plate', None))
+        # vgg = _as_float(getattr(row, 'vgg', None))
+        # vgg_ste = _as_float(getattr(row, 'vgg_ste', None))
+        # a = _as_float(getattr(row, 'a', None))
+        # b = _as_float(getattr(row, 'b', None))
+        # ua = _as_float(getattr(row, 'ua', None))
+        # ub = _as_float(getattr(row, 'ub', None))
+        # covab = _as_float(getattr(row, 'covab', None))
+
         base_name = os.path.splitext(os.path.basename(project_path))[0]
-        instrument = config.get('gravimeter', {}).get('type', 'A10')
-        default_plate_cm = _as_float(
-            config.get('gravimeter', {}).get('effective_height_cm', {}).get(instrument, 68.3)
-        )
-        input_plate_cm = h_eff_plate * 100.0 if h_eff_plate is not None else None
+        # instrument = config.get('gravimeter', {}).get('type', 'A10')
+        # default_plate_cm = _as_float(
+        #     config.get('gravimeter', {}).get('effective_height_cm', {}).get(instrument, 68.3)
+        # )
+
+        # If h_eff_plate is known, two-pass is not needed.
+        # if input_plate_cm is not None and vgg is not None and transfer_height is not None:
+
+       
+        # if vgg is None:
+            # vgg = vgg_from_quadratic(a, b, ua, ub, covab, transfer_height)
+            # log.info(f"vgg is missing: computed from quadratic coefficients as {vgg:.3f} µGal/cm")
 
         # transfer_height priority and fallback logic:
         # 1) if transfer_height is provided -> use it;
-        # 2) if missing -> compute from h_eff_plate - setup_height;
+        # 2) if missing -> compute from h_eff_plate + setup_height;
         # 3) if h_eff_plate is missing -> use near-constant fallback from config (68.3 cm by default).
-        if transfer_height is None:
-            if setup_height is None:
-                log.fail(
-                    "setup_height is required when transfer_height is missing"
-                )
-                close_project(main)
-                continue
+        # if transfer_height is None:
+        #     if setup_height is None:
+        #         log.fail(
+        #             "setup_height is required when transfer_height is missing"
+        #         )
+        #         close_project(main)
+        #         continue
 
-            plate_for_transfer_cm = input_plate_cm if input_plate_cm is not None else default_plate_cm
-            transfer_height = plate_for_transfer_cm - setup_height
-            if input_plate_cm is not None:
-                log.info(
-                    f"transfer_height is missing: computed as h_eff_plate - setup_height = "
-                    f"{plate_for_transfer_cm:.3f} - {setup_height:.3f} = {transfer_height:.3f} cm"
-                )
-            else:
-                log.info(
-                    f"transfer_height is missing: computed from default h_eff_plate={plate_for_transfer_cm:.3f} cm "
-                    f"and setup_height={setup_height:.3f} cm -> {transfer_height:.3f} cm"
-                )
+        #     if h_eff_plate is None:
 
-        # If h_eff_plate is known, two-pass is not needed.
-        if input_plate_cm is not None:
-            _run_single_pass(app, main, row, config, max_wait_time, vgg, transfer_height, report_file=None)
-        # If transfer_height was missing, we already derived it from setup_height/default plate,
-        # so run directly without two-pass.
-        elif _as_float(getattr(row, 'transfer_height', None)) is None:
-            _run_single_pass(app, main, row, config, max_wait_time, vgg, transfer_height, report_file=None)
-        else:
-            # Derive effective height from two runs when h_eff is unknown:
-            # 1) run with vgg = 0.0
-            # 2) run with vgg = -3.086
-            # h_eff_plate_cm = (gravity(-3.086) - gravity(0)) / -3.086
-            # Final run uses gradient between h_eff_plate and transfer_height.
-            log.info("h_eff_plate is missing with explicit transfer_height: enabling two-pass mode (vgg=0 and vgg=-3.086)")
-            vgg_zero = 0.0
-            vgg_ref = -3.086
-            report_0 = f"{base_name}_0"
-            report_vgg = f"{base_name}_vgg"
+        #         # Derive effective height from two runs when h_eff is unknown:
+        #         # 1) run with vgg = 0.0
+        #         # 2) run with vgg = -3.086
+        #         # h_eff_plate_cm = (gravity(-3.086) - gravity(0)) / -3.086
+        #         # Final run uses gradient between h_eff_plate and transfer_height.
 
-            _run_single_pass(app, main, row, config, max_wait_time, vgg_zero, 0.0, report_file=report_0)
-            _run_single_pass(app, main, row, config, max_wait_time, vgg_ref, 0.0, report_file=report_vgg)
+        #         log.info("h_eff_plate is missing with explicit transfer_height: enabling two-pass mode (vgg=0 and vgg=-3.086)")
+        #         vgg_zero = 0.0
+        #         vgg_ref = -3.086
+        #         report_0 = f"{base_name}_0"
+        #         report_vgg = f"{base_name}_vgg"
 
-            gravity_0 = _read_gravity_from_project_report(_report_txt_path(project_path, report_0))
-            gravity_vgg = _read_gravity_from_project_report(_report_txt_path(project_path, report_vgg))
+        #         if not os.path.exists(f"{report_0}.project.txt") and not os.path.exists(f"{report_vgg}.project.txt"):
+        #             _run_single_pass(app, main, row, config, max_wait_time, vgg_zero, 0.03, 0.0, report_file=report_0)
+        #             _run_single_pass(app, main, row, config, max_wait_time, vgg_ref, 0.03, 0.0, report_file=report_vgg)
 
-            if gravity_0 is not None and gravity_vgg is not None:
-                h_eff_plate_cm = (gravity_vgg - gravity_0) / vgg_ref
+        #         project_0, _ = read_project(_report_txt_path(project_path, report_0))
+        #         result.append(project_0)
+        #         gravity_0 = project_0[('Processing Results', 'Gravity', 'µGal')]
+        #         project_vgg, _ = read_project(_report_txt_path(project_path, report_vgg))
+        #         gravity_vgg = project_vgg[('Processing Results', 'Gravity', 'µGal')]
 
-                # Recompute gradient from quadratic profile using derived h_eff_plate.
-                # The two-pass runs serve only to estimate h_eff_plate; the actual
-                # gradient must come from the calibrated quadratic fit (a, b).
-                h_eff_plate_m = h_eff_plate_cm / 100.0
-                a = float(getattr(row, 'a', 0.0))
-                b = float(getattr(row, 'b', 0.0))
-                h1 = float(transfer_height) / 100.0
-                final_vgg = round(vgg_from_quadratic(a, b, h1, h_eff_plate_m) / 100.0, 6)  # µGal/m → µGal/cm
+        #         h_eff_plate = setup_height + (gravity_0 - gravity_vgg) / vgg_ref
+    
+        #     plate_for_transfer_cm = h_eff_plate if h_eff_plate is not None else default_plate_cm
+        #     transfer_height = plate_for_transfer_cm + setup_height
+        #     if h_eff_plate is not None:
+        #         log.info(
+        #             f"transfer_height is missing: computed as h_eff_plate + setup_height = "
+        #             f"{plate_for_transfer_cm:.3f} + {setup_height:.3f} = {transfer_height:.3f} cm"
+        #         )
+        #     else:
+        #         log.info(
+        #             f"transfer_height is missing: computed from default h_eff_plate={plate_for_transfer_cm:.3f} cm "
+        #             f"and setup_height={setup_height:.3f} cm -> {transfer_height:.3f} cm"
+        #         )
+ 
+        params = resolve_g9_params(
+            app=app,
+            main=main,
+            row=row,
+            config=config,
+            max_wait_time=max_wait_time,
+            base_name=base_name,
+            project_path=project_path,
+            result=result,
+            run_single_pass=_run_single_pass,
+            report_txt_path=_report_txt_path
+        )
 
-                final_transfer_height = transfer_height
+        if params is None:
+            close_project(main)
+            continue
 
-                log.ok(
-                    f"Derived h_eff_plate from two-pass for {base_name}: {h_eff_plate_cm:.3f} cm "
-                    f"(gravity(vgg_ref)={gravity_vgg:.2f}, gravity(0)={gravity_0:.2f})"
-                )
-                log.ok(
-                    f"Running final pass with gradient {final_vgg:.6f} µGal/cm "
-                    f"(quadratic a={a}, b={b}, h1={h1:.4f} m, h2={h_eff_plate_m:.4f} m); "
-                    f"G9 Transfer Height={final_transfer_height:.3f} cm"
-                )
-                _run_single_pass(app, main, row, config, max_wait_time, final_vgg, final_transfer_height, report_file=None)
-            else:
-                log.fail(
-                    "Failed to derive effective height from project reports "
-                    f"({_report_txt_path(project_path, report_0)} / {_report_txt_path(project_path, report_vgg)})"
-                )
+        transfer_height = params['transfer_height']
+        vgg = params['vgg']
+        vgg_ste = params['vgg_ste']
+        h_eff_plate = params['h_eff_plate']
+
+        _run_single_pass(app, main, row, config, max_wait_time, vgg, vgg_ste, transfer_height, report_file=None)
+
+        project_result = read_project(_report_txt_path(project_path))[0]
+        result.append(project_result)
 
         close_project(main)
 
     close_app(main)
+
+    return pd.DataFrame(result)

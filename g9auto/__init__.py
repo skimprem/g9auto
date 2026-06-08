@@ -7,6 +7,7 @@ from g9auto.logger import get_logger, setup_logging
 from g9auto.calibration import interpolate as interpolate_calibration
 from g9auto.gradient import vgg_from_quadratic, vgg_ste_from_quadratic
 from g9auto.site import prepare_site, prepare_dataframe
+from g9auto.params import resolve_g9_params
 
 __version__ = "0.1.0"
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
 	"vgg_ste_from_quadratic",
 	"prepare_site",
 	"prepare_dataframe",
+	"resolve_g9_params",
 ]

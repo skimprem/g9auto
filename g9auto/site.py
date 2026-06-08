@@ -112,9 +112,9 @@ def prepare_site(
 
     # --- height linking -------------------------------------------------
     if _notna(flat.get("h_eff")) and _notna(flat.get("setup_height")) and not _notna(flat.get("h_eff_plate")):
-        flat["h_eff_plate"] = round(float(flat["h_eff"]) + float(flat["setup_height"]) / 100.0, 6)
+        flat["h_eff_plate"] = round(float(flat["h_eff"]) + float(flat["setup_height"]), 6)
     if _notna(flat.get("h_eff_plate")) and _notna(flat.get("setup_height")) and not _notna(flat.get("h_eff")):
-        flat["h_eff"] = round(float(flat["h_eff_plate"]) - float(flat["setup_height"]) / 100.0, 6)
+        flat["h_eff"] = round(float(flat["h_eff_plate"]) - float(flat["setup_height"]), 6)
 
     # --- gradient -------------------------------------------------------
     # Compute working (local) gradient on the reduction segment:
@@ -129,10 +129,10 @@ def prepare_site(
             if _notna(flat.get("transfer_height")):
                 h1 = float(flat["transfer_height"]) / 100.0
             elif _notna(flat.get("h_eff")):
-                h1 = float(flat["h_eff"])
+                h1 = float(flat["h_eff"]) / 100.0
             else:
-                h1 = float(flat.get("grad_h1", 0.0))
-            vgg_m = vgg_from_quadratic(a, b, h1, h2)
+                h1 = float(flat.get("grad_h1", 0.0)) / 100.0
+            vgg_m = vgg_from_quadratic(a, b, h1, h2 / 100.0)
             flat["vgg"] = round(vgg_m / 100.0, 6)  # uGal/m → uGal/cm
 
     if not _notna(flat.get("vgg_ste")):
@@ -144,10 +144,10 @@ def prepare_site(
             if _notna(flat.get("transfer_height")):
                 h1 = float(flat["transfer_height"]) / 100.0
             elif _notna(flat.get("h_eff")):
-                h1 = float(flat["h_eff"])
+                h1 = float(flat["h_eff"]) / 100.0
             else:
-                h1 = float(flat.get("grad_h1", 0.0))
-            ste_m = vgg_ste_from_quadratic(ua, ub, covab, h1, h2)
+                h1 = float(flat.get("grad_h1", 0.0)) / 100.0
+            ste_m = vgg_ste_from_quadratic(ua, ub, covab, h1, h2 / 100.0)
             flat["vgg_ste"] = round(ste_m / 100.0, 6)  # uGal/m → uGal/cm
 
     # --- calibration: laser + Rb ----------------------------------------
@@ -173,7 +173,7 @@ def prepare_site(
     # --- defaults for optional fields -----------------------------------
     flat.setdefault("polar_x", 0.0)
     flat.setdefault("polar_y", 0.0)
-    flat.setdefault("comments", "")
+    # flat.setdefault("comments", "")
     flat.setdefault("order", "")
 
     return flat
