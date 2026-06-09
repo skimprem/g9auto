@@ -7,7 +7,7 @@ date: 2023-07-28
 
 site:
   # Real values for station akto
-  name: akto
+  site: akto
   code: "1303"
   latitude: 50.2886
   longitude: 57.1663
@@ -29,8 +29,3 @@ site:
     ua: 3.88
     ub: 2.70
     covab: -10.25
-
-  # Explicit laser/Rb values from reference/1303_akto.project.txt
-  red: 632.99027404
-  blue: 632.99125578
-  frequency: 9999999.99775

@@ -26,19 +26,22 @@ class g9Logger:
 
         self.logger = logging.getLogger('g9auto')
         self.logger.setLevel(logging.DEBUG)
+        self.logger.propagate = False
         self.verbose = False
         self._file_handler = None
         self._console_handler = None
+        self._current_section = None
 
         g9Logger._initialized = True
 
-    def setup(self, log_dir: str = 'logs', verbose: bool = False, log_to_file: bool = True):
+    def setup(self, log_dir: str = 'logs', verbose: bool = False, console: bool = True, log_to_file: bool = True):
         """
         Configure the logger.
 
         Args:
             log_dir: Directory for log files
             verbose: If True, duplicate logs to console
+            console: If True, enable console logging
             log_to_file: If True, write logs to file
         """
         self.verbose = verbose
@@ -48,10 +51,13 @@ class g9Logger:
 
         # Create formatters
         file_formatter = logging.Formatter(
-            '%(asctime)s | %(levelname)-8s | %(message)s',
+            '%(asctime)s [%(levelname)s] %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
-        console_formatter = logging.Formatter('%(message)s')
+        console_formatter = logging.Formatter(
+            '%(asctime)s [%(levelname)s] %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
 
         # File handler
         if log_to_file:
@@ -67,9 +73,14 @@ class g9Logger:
             self.logger.addHandler(self._file_handler)
 
         # Console handler (only if verbose)
-        if verbose:
+        if console:
             self._console_handler = logging.StreamHandler(sys.stdout)
-            self._console_handler.setLevel(logging.DEBUG)
+
+            if verbose:
+                self._console_handler.setLevel(logging.DEBUG)
+            else:
+                self._console_handler.setLevel(logging.INFO)
+
             self._console_handler.setFormatter(console_formatter)
             self.logger.addHandler(self._console_handler)
 
@@ -90,28 +101,33 @@ class g9Logger:
     def error(self, message: str):
         """Log error message."""
         self.logger.error(message)
+    
+    def section(self, title: str):
+        """Log a section header."""
+        self._current_section = title
+    
+    def _format(self, message: str) -> str:
+        """Format message with current section if applicable."""
+        if self._current_section:
+            return f"[{self._current_section}] {message}"
+        return message
 
     def ok(self, message: str):
         """Log success message with [OK] prefix."""
-        self.logger.info(f"{message}")
+        self.logger.debug(self._format(f"[OK] {message}"))
 
     def fail(self, message: str):
         """Log failure message with [FAIL] prefix."""
-        self.logger.error(f"{message}")
-
-    def section(self, title: str):
-        """Log section header."""
-        self.logger.info(title)
+        self.logger.error(self._format(f"[FAIL] {message}"))
 
     def success(self, message: str):
         """Log final success message."""
-        self.logger.info(f"✓ {message}")
+        self.logger.info("[SUCCESS] %s", message)
 
     def project_info(self, path: str, station: str):
         """Log project opening information."""
-        self.section("Open project")
-        self.logger.info(f"Path: {path}")
-        self.logger.info(f"Station: {station}")
+        self.logger.info("Station: %s", station)
+        self.logger.info("Project: %s", path)
 
 
 # Global logger instance
@@ -126,18 +142,19 @@ def get_logger() -> g9Logger:
     return _logger
 
 
-def setup_logging(log_dir: str = 'logs', verbose: bool = False, log_to_file: bool = True) -> g9Logger:
+def setup_logging(log_dir: str = 'logs', verbose: bool = False, console: bool = True, log_to_file: bool = True) -> g9Logger:
     """
     Setup and configure the global logger.
 
     Args:
         log_dir: Directory for log files
         verbose: If True, duplicate logs to console
+        console: If True, enable console logging
         log_to_file: If True, write logs to file
 
     Returns:
         Configured logger instance
     """
     logger = get_logger()
-    logger.setup(log_dir=log_dir, verbose=verbose, log_to_file=log_to_file)
+    logger.setup(log_dir=log_dir, verbose=verbose, console=console, log_to_file=log_to_file)
     return logger

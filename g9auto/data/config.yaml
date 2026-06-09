@@ -1,5 +1,6 @@
 logging:
-  verbose: true
+  console: true
+  verbose: false
   log_to_file: true
   log_dir: logs
 
@@ -16,7 +17,7 @@ gravimeter:
 comments_tab:
   operator: Roman Sermiagin
   institution: RSE NCGSI
-  comments: "Reprocessing comments:"
+  comments: "Reprocessing features:\n- Laser wavelengths refined\n- Rubidium frequency refined\n- Error budget revised\n- Self-attraction and diffraction corrections introduced\n\nNote: Result refers to the effective height"
 
 corrections:
   checkboxes:

@@ -121,7 +121,7 @@ def resolve_g9_params(
 
     # setup_height is always required
     if setup_height is None:
-        log.fail("setup_height is required but missing — skipping station")
+        log.error("setup_height is required but missing — skipping station")
         return None
 
     # ── Block A: resolve h_eff_plate ─────────────────────────────────────────

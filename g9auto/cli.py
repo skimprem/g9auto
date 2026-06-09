@@ -34,7 +34,8 @@ def _setup_logging(config: dict) -> None:
     log_cfg = config.get("logging", {})
     setup_logging(
         log_dir=log_cfg.get("log_dir", "logs"),
-        verbose=log_cfg.get("verbose", True),
+        verbose=log_cfg.get("verbose", False),
+        console=log_cfg.get("console", True),
         log_to_file=log_cfg.get("log_to_file", True),
     )
 
@@ -52,8 +53,6 @@ def cmd_run(args):
 
     config = _load_config(Path(args.config))
     _setup_logging(config)
-
-    print(config)
 
     from g9auto.core import run_app
     from g9auto.site import prepare_dataframe, prepare_site
@@ -87,16 +86,16 @@ def cmd_run(args):
 
     # optional single-station filter
     if args.station:
-        code = args.station
+        site = args.station
         mask = (
-            df.get("station", pd.Series(dtype=str)).astype(str).eq(code)
-            | df.get("point", pd.Series(dtype=str)).astype(str).eq(code)
-            | df.get("station_name", pd.Series(dtype=str)).astype(str).eq(code)
+            df.get("station", pd.Series(dtype=str)).astype(str).eq(site)
+            | df.get("code", pd.Series(dtype=str)).astype(str).eq(site)
+            | df.get("site", pd.Series(dtype=str)).astype(str).eq(site)
         )
         df = df[mask]
         if df.empty:
             print(
-                f"No rows found for --station '{code}'. "
+                f"No rows found for --station '{site}'. "
                 f"Available: {_available_stations(data_path, sep)}",
                 file=sys.stderr,
             )
@@ -115,7 +114,7 @@ def _detect_sep(path: Path) -> str:
 def _available_stations(path: Path, sep: str) -> str:
     import pandas as pd
     df = pd.read_csv(path, sep=sep, nrows=0)
-    cols = [c for c in ("station", "point", "station_name") if c in df.columns]
+    cols = [c for c in ("station", "code", "site") if c in df.columns]
     if not cols:
         return "(unknown)"
     df = pd.read_csv(path, sep=sep, usecols=cols)
@@ -190,8 +189,8 @@ def main():
         "--station",
         metavar="CODE",
         help=(
-            "Run only the row matching this station/point code "
-            "(matched against 'station', 'point', or 'station_name' columns)."
+            "Run only the row matching this site/code "
+            "(matched against 'site' or 'code' columns)."
         ),
     )
     run_parser.add_argument(
