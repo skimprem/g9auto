@@ -186,8 +186,22 @@ def main():
     '''Entry point for g9auto CLI.'''
     parser = argparse.ArgumentParser(
         prog="g9auto",
-        description="Automation tool for Micro-g LaCoste g9 gravimeter software.",
-    )
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""
+Automation tool for Micro-g LaCoste g9 gravimeter software.
+
+Available commands:
+  run          Run g9 processing workflow
+  config-init  Create default config.yaml
+  site-init    Create site YAML template
+
+For command-specific help use:
+
+  g9auto run --help
+  g9auto config-init --help
+  g9auto site-init --help
+"""
+)
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # ── run ──────────────────────────────────────────────────────────────
