@@ -11,11 +11,13 @@ site-init
 
 import argparse
 import sys
+import pandas as pd
 from importlib import resources
 from pathlib import Path
 
 import yaml
 
+from g9auto.logger import get_logger, setup_logging
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -23,15 +25,15 @@ import yaml
 
 def _load_config(config_path: Path) -> dict:
     if not config_path.exists():
-        print(f"Config file not found: {config_path}", file=sys.stderr)
-        sys.exit(1)
+        raise FileNotFoundError(f"Config file not found: {config_path}")
     with open(config_path, encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 def _setup_logging(config: dict) -> None:
-    from g9auto.logger import setup_logging
+
     log_cfg = config.get("logging", {})
+
     setup_logging(
         log_dir=log_cfg.get("log_dir", "logs"),
         verbose=log_cfg.get("verbose", False),
@@ -39,20 +41,33 @@ def _setup_logging(config: dict) -> None:
         log_to_file=log_cfg.get("log_to_file", True),
     )
 
+    log = get_logger()
+
+    log.info("Logging initialized")
+
+    log.info(
+        f"Logging: console={log_cfg.get('console', True)}, "
+        f"log_to_file={log_cfg.get('log_to_file', True)}, "
+        f"verbose={log_cfg.get('verbose', False)}"
+    )
 
 # ---------------------------------------------------------------------------
 # run subcommand
 # ---------------------------------------------------------------------------
 
 def cmd_run(args):
+    '''Run the automation workflow for one or more sites.'''
+
     try:
-        import pandas as pd
-    except ImportError:
-        print("pandas is required: pip install pandas", file=sys.stderr)
+        config = _load_config(Path(args.config))
+    except FileNotFoundError as e:
+        print(f'[ERROR] {e}', file=sys.stderr)
         sys.exit(1)
 
-    config = _load_config(Path(args.config))
     _setup_logging(config)
+
+    log = get_logger()
+    log.info(f"Config file: {Path(args.config).resolve()}")
 
     from g9auto.core import run_app
     from g9auto.site import prepare_dataframe, prepare_site
@@ -60,8 +75,9 @@ def cmd_run(args):
     # ── Mode A: single-site YAML ─────────────────────────────────────────
     if args.site:
         site_path = Path(args.site)
+        log.info(f'Mode: single site ({site_path})')
         if not site_path.exists():
-            print(f"Site file not found: {site_path}", file=sys.stderr)
+            log.error(f"Site file not found: {site_path}")
             sys.exit(1)
         with open(site_path, encoding="utf-8") as f:
             raw = yaml.safe_load(f)
@@ -72,32 +88,38 @@ def cmd_run(args):
 
     # ── Mode B: CSV list of sites ─────────────────────────────────────────
     if not args.data:
-        print("Provide either --data <csv> or --site <yaml>.", file=sys.stderr)
+        log.error("Provide either --data <csv> or --site <yaml>.")
         sys.exit(1)
 
     data_path = Path(args.data)
     if not data_path.exists():
-        print(f"Data file not found: {data_path}", file=sys.stderr)
+        log.error(f"Data file not found: {data_path}")
         sys.exit(1)
 
     # auto-detect separator
     sep = _detect_sep(data_path)
-    df = pd.read_csv(data_path, sep=sep, comment="#")
+    df = pd.read_csv(
+        data_path,
+        sep=sep,
+        comment="#",
+        dtype={
+            'site': str,
+            'code': str,
+        }
+    )
 
     # optional single-station filter
     if args.station:
-        site = args.station
-        mask = (
-            df.get("station", pd.Series(dtype=str)).astype(str).eq(site)
-            | df.get("code", pd.Series(dtype=str)).astype(str).eq(site)
-            | df.get("site", pd.Series(dtype=str)).astype(str).eq(site)
-        )
+        site = str(args.station).strip()
+        mask = pd.Series(False, index=df.index)
+        for col in ("station", "code", "site"):
+            if col in df.columns:
+                mask |= df[col].astype(str).str.strip().eq(site)
         df = df[mask]
         if df.empty:
-            print(
+            log.error(
                 f"No rows found for --station '{site}'. "
-                f"Available: {_available_stations(data_path, sep)}",
-                file=sys.stderr,
+                f"Available: {_available_stations(data_path, sep)}"
             )
             sys.exit(1)
 
@@ -129,13 +151,15 @@ def _available_stations(path: Path, sep: str) -> str:
 # ---------------------------------------------------------------------------
 
 def cmd_config_init(args):
+    '''Copy the default config.yaml template to the current directory.'''
+    log = get_logger()
     dest = Path.cwd() / "config.yaml"
     if dest.exists() and not args.force:
-        print("config.yaml already exists in current directory. Use --force to overwrite.")
+        log.error("config.yaml already exists in current directory. Use --force to overwrite.")
         sys.exit(1)
     with resources.files("g9auto.data").joinpath("config.yaml").open("rb") as src:
         dest.write_bytes(src.read())
-    print(f"Created {dest}")
+    log.info(f"Created {dest}")
 
 
 # ---------------------------------------------------------------------------
@@ -143,13 +167,15 @@ def cmd_config_init(args):
 # ---------------------------------------------------------------------------
 
 def cmd_site_init(args):
+    '''Copy the site_template.yaml to the current directory.'''
+    log = get_logger()
     dest = Path.cwd() / (args.output or "site.yaml")
     if dest.exists() and not args.force:
-        print(f"{dest.name} already exists. Use --force to overwrite.")
+        log.error(f"{dest.name} already exists. Use --force to overwrite.")
         sys.exit(1)
     with resources.files("g9auto.data").joinpath("site_template.yaml").open("rb") as src:
         dest.write_bytes(src.read())
-    print(f"Created {dest}")
+    log.info(f"Created {dest}")
 
 
 # ---------------------------------------------------------------------------
@@ -157,6 +183,7 @@ def cmd_site_init(args):
 # ---------------------------------------------------------------------------
 
 def main():
+    '''Entry point for g9auto CLI.'''
     parser = argparse.ArgumentParser(
         prog="g9auto",
         description="Automation tool for Micro-g LaCoste g9 gravimeter software.",

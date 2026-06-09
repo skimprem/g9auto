@@ -27,21 +27,19 @@ g9auto run --data example/sites_akto_batch.csv --config config.yaml
 Optional filter (single row from list):
 
 ```powershell
-g9auto run --data example/sites_akto_batch.csv --station 63 --config config.yaml
+g9auto run --data example/sites_akto_batch.csv --station 1303 --config config.yaml
 ```
 
 Use this mode to process a list of points. The CSV intentionally contains
 only fields required by `g9auto.site.prepare_site` and `run_app`:
 
 - `fg5_file`
-- `station_name` (mapped to station)
-- `point`
+- `site` (mapped to station)
+- `code`
 - `latitude`, `longitude`, `elevation`
-- `transfer_height` (required, cm)
-- `h_eff`
-- `vgg`, `vgg_ste`
-- `red`, `blue`, `frequency`
-- `date` (for laser/Rb interpolation)
+- `a`, `b`, `ua`, `ub`, `covab` (gradient parameters)
+- `setup_height` (required, cm)
+- `date` (for laser/Rb and polar x/y interpolation)
 
 Notes:
 
